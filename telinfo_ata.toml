@@ -204,10 +204,10 @@ antenna_position_frame = "ecef"
   name = "5h"
   number = 42
   position = [-2523836.636021752, -4123534.166729928, 4147820.5849095713]
-[[antennas]]
-  name = "6a"
-  number = 43
-  position = [-2524265.228, -4122660.291, 4148425.838]
+#[[antennas]]
+#  name = "6a"
+#  number = 43
+#  position = [-2524265.228, -4122660.291, 4148425.838]
 #[[antennas]]
 #  name = "6b"
 #  number = 44

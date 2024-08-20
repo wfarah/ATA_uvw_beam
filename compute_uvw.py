@@ -79,23 +79,33 @@ def compute_uvw(ts, source, ant_coordinates):
 
     return uvw
 
-
-telinfo_fname = "telinfo_ata.toml"
-telinfo = toml.load(telinfo_fname)
-itrf = parse_toml(telinfo)
+##############################################################################
+# User input #
+##############
 
 # Friday August 16, 7:15 PM PST
-t_now = 1723860949
+t_now = 1723860949 # unix time
+
 # Assume pointing at 3c286
 # coordinates at the time were
 # az,el ~= (261.6, 59.3)
 ra = 13.51896899 * 360 / 24.
 dec = 30.509157660
 
-source = SkyCoord(ra, dec, unit='deg')
+# Observing frequency, I don't assume BW, so UVW will only be at a single freq
+obsfreq = 3e9 #Hz
 
 # Calculate UVWs for 6h track, 5 mins integration
 t_range = np.arange(t_now, t_now + 6*3600, 300)
+
+# telinfo file
+telinfo_fname = "telinfo_ata.toml"
+##############################################################################
+
+telinfo = toml.load(telinfo_fname)
+itrf = parse_toml(telinfo)
+
+source = SkyCoord(ra, dec, unit='deg')
 
 ts = Time(t_range, format='unix')
 uvws = compute_uvw(ts, source, itrf[['x', 'y', 'z']].values)
@@ -110,7 +120,7 @@ plt.ylabel("V [m]")
 
 
 # Assume doing this at 3GHz
-lmbd = c/3e9
+lmbd = c/obsfreq
 
 uv /= np.array(lmbd)
 
