@@ -86,17 +86,17 @@ def compute_uvw(ts, source, ant_coordinates):
 # Friday August 16, 7:15 PM PST
 t_now = 1723860949 # unix time
 
+# Calculate UVWs for 6h track, 5 mins integration
+t_range = np.arange(t_now, t_now + 6*3600, 300)
+
 # Assume pointing at 3c286
 # coordinates at the time were
 # az,el ~= (261.6, 59.3)
-ra = 13.51896899 * 360 / 24.
-dec = 30.509157660
+ra = 13.51896899 * 360 / 24. # deg
+dec = 30.509157660           # deg
 
 # Observing frequency, I don't assume BW, so UVW will only be at a single freq
 obsfreq = 3e9 #Hz
-
-# Calculate UVWs for 6h track, 5 mins integration
-t_range = np.arange(t_now, t_now + 6*3600, 300)
 
 # telinfo file
 telinfo_fname = "telinfo_ata.toml"
@@ -113,6 +113,8 @@ uvws = compute_uvw(ts, source, itrf[['x', 'y', 'z']].values)
 # cycle through each uvw integration
 uvws = uvws.reshape(-1, uvws.shape[-1])
 
+# UV is a hermitian matrix, so we "populate" the entire matrix by 
+# mirroring wrt the origin
 uv = np.concatenate((uvws[:,0], -1*uvws[:,0])), np.concatenate((uvws[:,1], -1*uvws[:,1]))
 plt.scatter(uv[0], uv[1], color="black", s=3)
 plt.xlabel("U [m]")
@@ -122,6 +124,7 @@ plt.ylabel("V [m]")
 # Assume doing this at 3GHz
 lmbd = c/obsfreq
 
+# UV [m] -> UV[lambda]
 uv /= np.array(lmbd)
 
 # This is a bit arbitrary, should think of a better way to do this
@@ -131,7 +134,7 @@ cellsize = int(np.max((np.max(uv[0]), np.max(uv[1])))/12)
 hist = plt.hist2d(uv[0], uv[1], bins=cellsize)
 grid = hist[0]
 
-# This seemed to be needed for some reason
+# This seemed to be needed for some reason (plotting?)
 dd = np.flipud(grid.T)
 
 # Increase the resolution by 12x in the image plane by padding zeros on either side of the gridded matrix
@@ -168,8 +171,8 @@ plt.figure()
 plt.clf()
 plt.title("UV Coverage")
 plt.scatter(uv[0]/1e3, uv[1]/1e3, s=1)
-plt.xlabel("U [klambda]")
-plt.ylabel("V [klambda]")
+plt.xlabel("U [k$\lambda$]")
+plt.ylabel("V [k$\lambda$]")
 
 plt.figure()
 plt.clf()
